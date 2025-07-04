@@ -1,8 +1,16 @@
 FROM python:3.11
 
+# ساخت پوشه کاری
 WORKDIR /app
+
+# کپی کردن کل پروژه
 COPY . /app
 
-RUN pip install mysql-connector-python
+# نصب کتابخانه‌ها
+RUN pip install mysql-connector-python pymongo textblob
 
+# دانلود دیتاهای لازم TextBlob
+RUN python -m textblob.download_corpora
+
+# اجرای برنامه
 CMD ["python", "subscriber.py"]

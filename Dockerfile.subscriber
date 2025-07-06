@@ -1,16 +1,16 @@
 FROM python:3.11
 
-# ساخت پوشه کاری
+# مسیر کاری داخل کانتینر
 WORKDIR /app
 
-# کپی کردن کل پروژه
+# کپی پروژه
 COPY . /app
 
-# نصب کتابخانه‌ها
-RUN pip install mysql-connector-python pymongo textblob
+# نصب کتابخانه‌های مورد نیاز
+RUN pip install mysql-connector-python pymongo textblob neo4j
 
-# دانلود دیتاهای لازم TextBlob
+# دانلود دیتاهای مورد نیاز TextBlob
 RUN python -m textblob.download_corpora
 
-# اجرای برنامه
+# اجرای اسکریپت subscriber
 CMD ["python", "subscriber.py"]

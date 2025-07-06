@@ -1,0 +1,13 @@
+FROM python:3.11
+
+# مسیر کاری داخل کانتینر
+WORKDIR /app
+
+# کپی فایل‌ها به داخل کانتینر
+COPY . /app
+
+# نصب کتابخانه‌های لازم
+RUN pip install praw
+
+# اجرای برنامه
+CMD ["python", "RedditPublisher.py"]

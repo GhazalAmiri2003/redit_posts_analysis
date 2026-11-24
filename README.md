@@ -23,5 +23,17 @@ Python · PRAW · TextBlob · MySQL · MongoDB · Neo4j · SQLite · Docker Comp
 | `main.py` | Standalone data collection and analysis |
 | `docker-compose.yml` | Local multi-service environment |
 
+## Local setup
+
+Copy `.env.example` to `.env` and supply newly generated credentials locally. Do not commit the actual file. For public-data read-only access, Reddit username and password are optional. Set strong local MySQL and Neo4j passwords.
+
+```bash
+docker compose config --quiet
+docker compose up --build
+```
+
+Existing database volumes may require a separate password migration; do not delete data volumes without a backup. Host ports are bound to localhost. For a standalone Python run, export the Reddit environment variables into the Python process first.
+
 ## Status
-Educational prototype. Before running or deploying it, replace committed credentials with environment-based configuration, revoke any previously exposed credentials, review the Git history and verify the local database settings. The file-based handoff is a prototype rather than a durable message broker. No independent runtime verification is claimed.
+
+Educational prototype. The current configuration no longer contains literal Reddit, MySQL or Neo4j credentials. Previously committed credentials must be revoked or rotated; the existing Git history has not been rewritten. The file-based handoff is a prototype rather than a durable message broker. Runtime verification is pending.

@@ -10,14 +10,14 @@ services:
       --collation-server=utf8mb4_unicode_ci
       --explicit_defaults_for_timestamp
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}"
       MYSQL_DATABASE: reddit_data
     ports:
-      - "3308:3306"
+      - "127.0.0.1:3308:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p\"$$MYSQL_ROOT_PASSWORD\""]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -32,16 +32,16 @@ services:
     environment:
       PMA_HOST: mysql
       PMA_USER: root
-      PMA_PASSWORD: root
+      PMA_PASSWORD: "${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}"
     ports:
-      - "8081:80"   # phpMyAdmin روی 8081
+      - "127.0.0.1:8081:80"   # phpMyAdmin روی 8081
 
   mongo:
     image: mongo:6.0
     container_name: mongodb
     restart: always
     ports:
-      - "27018:27017"
+      - "127.0.0.1:27018:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
@@ -61,7 +61,7 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_MONGODB_PORT: 27017
     ports:
-      - "8082:8081"  # mongo-express روی 8082
+      - "127.0.0.1:8082:8081"  # mongo-express روی 8082
 
   neo4j:
     image: neo4j:2025.06.0
@@ -70,12 +70,12 @@ services:
     environment:
       NEO4J_AUTH: "neo4j/test1234"
     ports:
-      - "7474:7474"
-      - "7687:7687"
+      - "127.0.0.1:7474:7474"
+      - "127.0.0.1:7687:7687"
     volumes:
       - neo4j_data:/data
     healthcheck:
-      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "test1234", "RETURN 1;"]
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p \"$${NEO4J_AUTH#*/}\" \"RETURN 1;\""]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -99,7 +99,7 @@ services:
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}"
       MYSQL_DATABASE: reddit_data
       MONGO_HOST: mongodb
       MONGO_PORT: 27017
@@ -119,18 +119,18 @@ services:
     volumes:
       - .:/app
     environment:
-      REDDIT_CLIENT_ID: JZHiG9zwTTTFAjtRw3phQ
-      REDDIT_SECRET: AOJp98XAKypuAO38fchr3yGeBnAzFQ
-      REDDIT_USERNAME: Strange-Molasses-806
-      REDDIT_PASSWORD: ghazadd82Am#
-      REDDIT_USER_AGENT: SocialMediaAnalysisApp by /u/Strange-Molasses-806
+      REDDIT_CLIENT_ID: "${REDDIT_CLIENT_ID:?Set REDDIT_CLIENT_ID}"
+      REDDIT_SECRET: "${REDDIT_SECRET:?Set REDDIT_SECRET}"
+      REDDIT_USERNAME: "${REDDIT_USERNAME:-}"
+      REDDIT_PASSWORD: "${REDDIT_PASSWORD:-}"
+      REDDIT_USER_AGENT: "${REDDIT_USER_AGENT:-python:reddit-data-analysis:1.0}"
 
   web:
     image: php:apache
     container_name: reddit_web
     restart: always
     ports:
-      - "8000:80"
+      - "127.0.0.1:8000:80"
     volumes:
       - ./html:/var/www/html
     depends_on:
@@ -139,7 +139,7 @@ services:
     environment:
       MYSQL_HOST: mysql
       MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_PASSWORD: "${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}"
       MYSQL_DATABASE: reddit_data
       MYSQL_PORT: 3306
       MONGO_HOST: mongodb
